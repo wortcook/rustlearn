@@ -2,6 +2,7 @@ mod hello_world;
 mod logs;
 mod lorem;
 mod ctrl_c;
+mod blank;
 
 fn main() {
     // read the first argument from the terminal
@@ -18,5 +19,7 @@ fn main() {
         lorem::main();
     }else if example=="ctrl_c"{
         ctrl_c::main();
+    }else if example=="blank"{
+        blank::main();
     }
 }

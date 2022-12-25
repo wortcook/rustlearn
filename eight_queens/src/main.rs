@@ -1,4 +1,4 @@
-const N: usize = 8;
+const N: usize = 13;
 
 fn try_solution(mut board: &mut [[bool; N]; N], row: usize, mut count: &mut i64) {
     if row == N {
