@@ -4,6 +4,11 @@ use num_bigint::BigUint;
 use std::sync::{Mutex, RwLock};
 use std::thread;
 
+use std::io::{self, Write};
+
+
+const LOOKUP_SIZE : usize = 1_000_000;
+const STARTING_NUMBER : u64 = 100_000_000_000_000_000u64;
 
 
 lazy_static!(    
@@ -27,8 +32,8 @@ fn check_prime(ref number: &BigUint) -> bool{
             break;
         }
     }
-    *counter.lock().unwrap() += 1;
-    println!("{} : {} ", counter.lock().unwrap(), number);
+    // *counter.lock().unwrap() += 1;
+    // println!("{} : {} ", counter.lock().unwrap(), number);
     return true;
 }
 
@@ -44,28 +49,68 @@ fn check_prime_large(ref number: &BigUint) -> bool{
     }
 
     let ref val_next_check = prime_list_l.last().unwrap();
-    let mut next_check = *val_next_check + 2u32;
+    let mut next_check = 10u32*(*val_next_check/10u32) + 1u32;
 
     let mut check_counter : u64 = 0u64;
 
+    println!("Deep checking {}", number);
     while next_check < max_check {
-        let ref mod_next_check = next_check;
-        let remainder = *number % mod_next_check;
-        if remainder == *ZERO {
-            println!();
-            return false;
-        }
-
-        if check_counter % 10000000 == 0 {
+        if check_counter % 10_000_000 == 0 {
             print!("#");
+            io::stdout().flush().unwrap();
         }
 
         check_counter += 1;
 
+        //check numbers ending in 1
+        {
+            let ref mod_next_check = next_check;
+            let remainder = *number % mod_next_check;
+            if remainder == *ZERO {
+                println!();
+                return false;
+            }
+        }
         next_check += 2u32;
+
+        //check numbers ending in 3
+        {
+            let ref mod_next_check = next_check;
+            let remainder = *number % mod_next_check;
+            if remainder == *ZERO {
+                println!();
+                return false;
+            }
+        }
+        next_check += 4u32;
+
+
+        //check numbers ending in 7
+        {
+            let ref mod_next_check = next_check;
+            let remainder = *number % mod_next_check;
+            if remainder == *ZERO {
+                println!();
+                return false;
+            }
+        }
+        next_check += 2u32;
+
+        //check numbers ending in 9
+        {
+            let ref mod_next_check = next_check;
+            let remainder = *number % mod_next_check;
+            if remainder == *ZERO {
+                println!();
+                return false;
+            }
+        }
+        next_check += 2u32;  //and back to 1
     }
+    *counter.lock().unwrap() += 1;
     println!();
-    println!("{}", number);
+    println!("{} : {} ", counter.lock().unwrap(), number);
+    io::stdout().flush().unwrap();
 
     return true;
 }
@@ -84,7 +129,7 @@ fn main() {
 
     let mut number = BigUint::from(10u32);
     
-    for _ in 0..1_000 {
+    for _ in 0..LOOKUP_SIZE {
     // loop{
         let candidate_one   : BigUint = &number + 1u32;
         let candidate_three : BigUint = &number + 3u32;
@@ -124,7 +169,10 @@ fn main() {
         number += 10u32;
     }
 
-    number += 10_000_000_000_000_000_000u64;
+    number = BigUint::from(STARTING_NUMBER);
+    number *= 1_000_000u32;
+
+
     // for _ in 0..10000000 {
     loop{
         let candidate_one   : BigUint = &number + 1u32;
